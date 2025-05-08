@@ -19,6 +19,7 @@ counter=0
 
 
 
+
 def guess_random_number(modifiedMessage,client_address):
 	
 	global winner, winner_name,x
@@ -84,28 +85,34 @@ def program (connectionSocket, address,max_player):
 	print (player_udp_addresses)
 	while True:
 		#to check if client still connected 
-		client_name = connectionSocket.recv(1024).decode()
-		if (not client_name) and (clientAddress[1] in player_udp_addresses):
-			print (player_udp_addresses[clientAddress[1]] ," is disconnected ")
+		
+		try:
+			client_name = connectionSocket.recv(1024).decode()
+		except timeout :
+			pass
+		except (ConnectionResetError , ConnectionAbortedError , OSError):
+			if  (clientAddress[1] in player_udp_addresses):
+				print (player_udp_addresses[clientAddress[1]] ," is disconnected ")
+				number_of_player -=1
+
 		############
 			
 		# client guess
-		message, clientAddress = server_socket1.recvfrom(1024)
-		message=message.decode()
 		
-		
-
+			message, clientAddress = server_socket1.recvfrom(1024)
+			message=message.decode()
 		#send the result to client 
-		message=guess_random_number(message,clientAddress[1])
-		server_socket1.sendto(message.encode(),clientAddress)
+			message=guess_random_number(message,clientAddress[1])
+			if number_of_player <=1:
+				message="Correct"
+			server_socket1.sendto(message.encode(),clientAddress)
 		###############
 
 
 		# escape if one win or time out or number of player >=1
-		
+			
 		escape=time.time()-start_time
-		print (winner)
-		if escape >= 60 or winner :
+		if escape >= 60 or winner  or number_of_player <=1 :
 			break
 		
 		
@@ -136,6 +143,7 @@ def program (connectionSocket, address,max_player):
 
 x=random.randint(0,100)
 max_player=input("Enter the max number of player ")
+max_player=int(max_player)
 print ("the number is = ",x)
 server_socket1 = socket(AF_INET,SOCK_DGRAM)  # get instance
 server_socket1.bind((host, udp_port))
@@ -145,7 +153,7 @@ server_socket.bind((host, tcp_port))  # bind host address and port together
 # configure how many client the server can listen simultaneously #2
 server_socket.listen(4)
 thread=[]
-for _ in range(2):
+for _ in range(max_player):
 	connectionSocket, address = server_socket.accept()  # accept new connectionSocketection
 	t = threading.Thread(target=program, args=(connectionSocket, address,max_player))
 	t.start()

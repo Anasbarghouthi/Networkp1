@@ -46,7 +46,7 @@ while modifiedMessage != "Correct" and modifiedMessage != "There is a winner":
 
 
 	
-client_socket1.close()
+
 
 
 
@@ -55,5 +55,5 @@ print ("===GAME RESULTS===\n")
 data = client_socket.recv(1024).decode()  # receive response
 print (data)
 client_socket.close()  # close the connection
-
+client_socket1.close()
 
