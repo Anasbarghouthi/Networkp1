@@ -15,7 +15,7 @@ while data.lower().strip() != 'Enter game':
 	if data == 'Enter game':
 		break
 	message = input("Enter new  name:")  # again take input
-#client_socket.close()  # close the connection
+
 
 
 data = client_socket.recv(1024).decode()  # receive response
@@ -25,13 +25,20 @@ client_socket1 = socket(AF_INET, SOCK_DGRAM)
 client_socket1.connect((host, udp_port))
 
 modifiedMessage = ""
-while modifiedMessage != "winner": 
+while modifiedMessage != "winner" and modifiedMessage != "There is a winner":
+    check_massage="connected"
+    client_socket.send(check_massage.encode())
+
     message = input("Enter your guess: ")  
-    client_socket1.send(message.encode())  
-    modifiedMessage = client_socket1.recv(1024).decode()  
+    client_socket1.sendto(message.encode(),(host,udp_port))
+    modifiedMessage, _ = client_socket1.recvfrom(1024)
+    modifiedMessage=modifiedMessage.decode()
+
     print("Feedback", modifiedMessage) 
-    if modifiedMessage == "There is a winner": 
-        break 
+    number_of_player = client_socket.recv(1024).decode()
+    number_of_player=int (number_of_player)
+    if number_of_player <= 1  or modifiedMessage == "There is a winner" or modifiedMessage == "winner":
+          break
     time.sleep(10.0) 
 
 
@@ -42,8 +49,7 @@ client_socket1.close()
 
 
 
-#client_socket = socket(AF_INET,SOCK_STREAM)  # instantiate
-#client_socket.connect((host, tcp_port))  # connect to the server
+print ("===GAME RESULTS===\n")
 data = client_socket.recv(1024).decode()  # receive response
 print (data)
 data = client_socket.recv(1024).decode()  # receive response

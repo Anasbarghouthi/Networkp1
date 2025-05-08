@@ -9,29 +9,26 @@ import copy
 
 player_list=[]
 players_ips={}
+player_udp_addresses = {}
 winner=False
 winner_name=""
 host = gethostname() # get the hostname
 tcp_port = 6000
 udp_port = 6001 
-x=2 
 number_of_player=0
 counter=0
 
 
 
 def guess_random_number(modifiedMessage,Thread_id):
+	
+	print(Thread_id,"  ",players_ips[Thread_id]," --->  ",modifiedMessage)
 
 	global winner, winner_name,x
 	if winner :
 		return "There is a winner"
-	if not modifiedMessage.isdigit():
-        
+	if not modifiedMessage.isdigit(): 
 		return "Please send a valid number."
-	
-	print (winner_name)
-	print(Thread_id, " ,  ",players_ips[Thread_id])
-	
 	
 	modifiedMessage=int(modifiedMessage)
 	if (x > modifiedMessage):
@@ -74,7 +71,7 @@ def program (connectionSocket, address):
 				connectionSocket.send(data.encode())  # send data to the client
 				break	
 
-	#connectionSocket.close()  # close the connectionSocketection
+	
 	
 	while number_of_player < 2:
 		time.sleep(0.2)
@@ -83,35 +80,62 @@ def program (connectionSocket, address):
 	connectionSocket.send(data.encode())
 	
 	
-	start_time=time.time()
-	
-	print(players_ips)
+	start_time=time.time() 
+	string_number_of_players=str(number_of_player)
 	while True:
+		#to check if client still connected 
+		check_massage = connectionSocket.recv(1024).decode()
+		if not check_massage:
+			print (players_ips[thread_ID]," is disconnected ")
+			number_of_player -=1
+			string_number_of_players=str(number_of_player)
+			exit
+		############
+			
+		# client guess
 		message, clientAddress = server_socket1.recvfrom(1024) 
+
+		if thread_ID not in player_udp_addresses:
+			player_udp_addresses[thread_ID] = clientAddress
 		message=message.decode()
-		print (message)
+		###############
+
+		print(thread_ID,"  ",players_ips[thread_ID]," --->  ",message)
+
+		#send the result to client 
 		message=guess_random_number(message,thread_ID)
-		server_socket1.sendto(message.encode(),clientAddress)
+		server_socket1.sendto(message.encode(),player_udp_addresses[thread_ID])
+		###############
+
+
+		# escape if one win or time out or number of player >=1
 		escape=time.time()-start_time
-		if escape >= 60 :
+		connectionSocket.send(string_number_of_players.encode())
+		if escape >= 60 or winner or number_of_player <= 1:
 			break
-		if winner:
-			break
+		
+		
+		########################
+
+
 	
-	#counter +=1
-	#while counter < number_of_player:
-		time.sleep(10)		
+	counter +=1
+	while counter < number_of_player :
+		time.sleep(0.2)
+		
 	
 	if winner:
-		data = " === the winner is === \n"
-		connectionSocket.send(data.encode())  # send data to the client
 		data = winner_name
 		connectionSocket.send(data.encode())  # send data to the client
-		connectionSocket.close()  # close the connectionSocketection
-	else:
-		data = " === Everyone lost === \n"
+	elif number_of_player <= 1 :
+		data = " === the another player disconnect === \n  you are the winner "
 		connectionSocket.send(data.encode())  # send data to the client
-		connectionSocket.close()  # close the connectionSocketection
+	else:
+		data = " === Everyone lost =="
+		connectionSocket.send(data.encode())  # send data to the client
+
+		
+	connectionSocket.close()  # close the connectionSocketection	
 
 	
 
