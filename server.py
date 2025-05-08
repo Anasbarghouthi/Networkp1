@@ -8,7 +8,6 @@ import copy
 
 
 player_list=[]
-players_ips={}
 player_udp_addresses = {}
 winner=False
 winner_name=""
@@ -20,10 +19,8 @@ counter=0
 
 
 
-def guess_random_number(modifiedMessage,Thread_id):
+def guess_random_number(modifiedMessage,client_address):
 	
-	print(Thread_id,"  ",players_ips[Thread_id]," --->  ",modifiedMessage)
-
 	global winner, winner_name,x
 	if winner :
 		return "There is a winner"
@@ -32,13 +29,13 @@ def guess_random_number(modifiedMessage,Thread_id):
 	
 	modifiedMessage=int(modifiedMessage)
 	if (x > modifiedMessage):
-		return "higher"
+		return "Higher"
 	elif (x < modifiedMessage):
-		return "lower"
+		return "Lower"
 	else :
 		winner=True
-		winner_name=players_ips[Thread_id]
-		return "winner"
+		winner_name=player_udp_addresses[client_address]
+		return "Correct"
 	
 	
 
@@ -48,7 +45,7 @@ def program (connectionSocket, address):
 	
 	global winner, winner_name,number_of_player,counter
 	number_of_player +=1
-	thread_ID=threading.get_ident()
+	
 	
 
 	print(f"Connection from: {address}")
@@ -65,8 +62,6 @@ def program (connectionSocket, address):
 					break
 			if t:
 				player_list.append(data)
-				print ( thread_ID , "   ", data )
-				players_ips[thread_ID]=data
 				data = "Enter game"
 				connectionSocket.send(data.encode())  # send data to the client
 				break	
@@ -81,37 +76,47 @@ def program (connectionSocket, address):
 	
 	
 	start_time=time.time() 
+
 	string_number_of_players=str(number_of_player)
 	while True:
 		#to check if client still connected 
-		check_massage = connectionSocket.recv(1024).decode()
-		if not check_massage:
-			print (players_ips[thread_ID]," is disconnected ")
-			number_of_player -=1
-			string_number_of_players=str(number_of_player)
-			exit
+		client_name = connectionSocket.recv(1024).decode()
+		if not client_name and clientAddress[1] in player_udp_addresses:
+			print (player_udp_addresses[clientAddress[1]] ," is disconnected ")
+			disconnected=player_udp_addresses[clientAddress[1]],"is disconnected"
+			server_socket.send(disconnected.encode())
+			continue_playing = connectionSocket.recv(1024).decode()
+			if continue_playing == "yes":
+				number_of_player -=1
+				string_number_of_players=str(number_of_player)
+			else:
+				break
+		none =""
+		server_socket.send(none.encode())
+		none = connectionSocket.recv(1024).decode()			
 		############
 			
 		# client guess
-		message, clientAddress = server_socket1.recvfrom(1024) 
+		message, clientAddress = server_socket1.recvfrom(1024)
 
-		if thread_ID not in player_udp_addresses:
-			player_udp_addresses[thread_ID] = clientAddress
+
+		if clientAddress[1] not in player_udp_addresses:
+			player_udp_addresses[clientAddress[1]] = client_name 
 		message=message.decode()
 		###############
 
-		print(thread_ID,"  ",players_ips[thread_ID]," --->  ",message)
+		
 
 		#send the result to client 
-		message=guess_random_number(message,thread_ID)
-		server_socket1.sendto(message.encode(),player_udp_addresses[thread_ID])
+		message=guess_random_number(message,clientAddress[1])
+		server_socket1.sendto(message.encode(),player_udp_addresses[clientAddress[1]])
 		###############
 
 
 		# escape if one win or time out or number of player >=1
 		escape=time.time()-start_time
 		connectionSocket.send(string_number_of_players.encode())
-		if escape >= 60 or winner or number_of_player <= 1:
+		if escape >= 60 or winner :
 			break
 		
 		
