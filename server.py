@@ -41,7 +41,7 @@ def guess_random_number(modifiedMessage,client_address):
 
 
 	
-def program (connectionSocket, address):
+def program (connectionSocket, address,max_player):
 	
 	global winner, winner_name,number_of_player,counter
 	
@@ -71,7 +71,7 @@ def program (connectionSocket, address):
 			player_udp_addresses[clientAddress[1]] = message.decode()
 
 	number_of_player +=1
-	while number_of_player < 2:
+	while number_of_player < max_player:
 		time.sleep(0.2)
 
 
@@ -135,6 +135,7 @@ def program (connectionSocket, address):
 
 
 x=random.randint(0,100)
+max_player=input("Enter the max number of player ")
 print ("the number is = ",x)
 server_socket1 = socket(AF_INET,SOCK_DGRAM)  # get instance
 server_socket1.bind((host, udp_port))
@@ -146,7 +147,7 @@ server_socket.listen(4)
 thread=[]
 for _ in range(2):
 	connectionSocket, address = server_socket.accept()  # accept new connectionSocketection
-	t = threading.Thread(target=program, args=(connectionSocket, address))
+	t = threading.Thread(target=program, args=(connectionSocket, address,max_player))
 	t.start()
 	thread.append(t)
 
