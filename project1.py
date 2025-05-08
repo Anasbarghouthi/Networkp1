@@ -30,12 +30,7 @@ modifiedMessage = ""
 while modifiedMessage != "winner" and modifiedMessage != "There is a winner":
     check_massage=client_name
     client_socket.send(check_massage.encode())
-    dis_client=client_socket.recv(1024).decode()
-    if dis_client != "" :
-        dis_client=input (dis_client," disconnected do you want to continue . enter yes")
-        if dis_client !="yes" :
-              break 
-    client_socket.send(dis_client.encode())
+   
 
     message = input("Enter your guess: ")  
     client_socket1.sendto(message.encode(),(host,udp_port))
@@ -43,9 +38,8 @@ while modifiedMessage != "winner" and modifiedMessage != "There is a winner":
     modifiedMessage=modifiedMessage.decode()
 
     print("Feedback", modifiedMessage) 
-    number_of_player = client_socket.recv(1024).decode()
-    number_of_player=int (number_of_player)
-    if number_of_player <= 1  or modifiedMessage == "There is a winner" or modifiedMessage == "winner":
+   
+    if  modifiedMessage == "There is a winner" or modifiedMessage == "winner":
           break
     time.sleep(10.0) 
 

@@ -45,8 +45,6 @@ def program (connectionSocket, address):
 	
 	global winner, winner_name,number_of_player,counter
 	number_of_player +=1
-	
-	
 
 	print(f"Connection from: {address}")
 
@@ -78,22 +76,12 @@ def program (connectionSocket, address):
 	start_time=time.time() 
 
 	string_number_of_players=str(number_of_player)
+
 	while True:
 		#to check if client still connected 
 		client_name = connectionSocket.recv(1024).decode()
-		if not client_name and clientAddress[1] in player_udp_addresses:
+		if (not client_name) and (clientAddress[1] in player_udp_addresses):
 			print (player_udp_addresses[clientAddress[1]] ," is disconnected ")
-			disconnected=player_udp_addresses[clientAddress[1]],"is disconnected"
-			server_socket.send(disconnected.encode())
-			continue_playing = connectionSocket.recv(1024).decode()
-			if continue_playing == "yes":
-				number_of_player -=1
-				string_number_of_players=str(number_of_player)
-			else:
-				break
-		none =""
-		server_socket.send(none.encode())
-		none = connectionSocket.recv(1024).decode()			
 		############
 			
 		# client guess
@@ -109,20 +97,21 @@ def program (connectionSocket, address):
 
 		#send the result to client 
 		message=guess_random_number(message,clientAddress[1])
-		server_socket1.sendto(message.encode(),player_udp_addresses[clientAddress[1]])
+		server_socket1.sendto(message.encode(),clientAddress)
 		###############
 
 
 		# escape if one win or time out or number of player >=1
+		
 		escape=time.time()-start_time
-		connectionSocket.send(string_number_of_players.encode())
+		print (winner)
 		if escape >= 60 or winner :
 			break
 		
 		
 		########################
 
-
+	print("sssssss")
 	
 	counter +=1
 	while counter < number_of_player :
@@ -144,8 +133,7 @@ def program (connectionSocket, address):
 
 	
 
-# def server():
-# as both code is running on same pc
+
 x=random.randint(0,100)
 print ("the number is = ",x)
 server_socket1 = socket(AF_INET,SOCK_DGRAM)  # get instance
@@ -155,14 +143,26 @@ server_socket = socket(AF_INET,SOCK_STREAM)  # get instance
 server_socket.bind((host, tcp_port))  # bind host address and port together
 # configure how many client the server can listen simultaneously #2
 server_socket.listen(4)
-while True:
-	if number_of_player <= 4:
-		connectionSocket, address = server_socket.accept()  # accept new connectionSocketection
-		t = threading.Thread(target=program, args=(connectionSocket, address))
-		t.start()
-	else:
-		print ("Maximum number of players reached. No more connections accepted.")
-		break	
+thread=[]
+for _ in range(4):
+	connectionSocket, address = server_socket.accept()  # accept new connectionSocketection
+	t = threading.Thread(target=program, args=(connectionSocket, address))
+	t.start()
+	thread.append(t)
+
+for th in thread:
+	th.join()
+	 
+
+
+# while True:
+# 	if number_of_player <= 4:
+# 		connectionSocket, address = server_socket.accept()  # accept new connectionSocketection
+# 		t = threading.Thread(target=program, args=(connectionSocket, address))
+# 		t.start()
+# 	else:
+# 		print ("Maximum number of players reached. No more connections accepted.")
+# 		break	
 
 
 
