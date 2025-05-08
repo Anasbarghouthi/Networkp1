@@ -18,19 +18,19 @@ while data.lower().strip() != 'Enter game':
 
 client_name=message
 
-data = client_socket.recv(1024).decode()  # receive response
-
-
 client_socket1 = socket(AF_INET, SOCK_DGRAM)
 client_socket1.connect((host, udp_port))
+client_socket1.sendto(client_name.encode(),(host,udp_port))
+
+data = client_socket.recv(1024).decode()  # receive response
 
 modifiedMessage = ""
 
+
 #UDP sending 
-while modifiedMessage != "winner" and modifiedMessage != "There is a winner":
+while modifiedMessage != "Correct" and modifiedMessage != "There is a winner":
     check_massage=client_name
     client_socket.send(check_massage.encode())
-   
 
     message = input("Enter your guess: ")  
     client_socket1.sendto(message.encode(),(host,udp_port))
@@ -39,7 +39,7 @@ while modifiedMessage != "winner" and modifiedMessage != "There is a winner":
 
     print("Feedback", modifiedMessage) 
    
-    if  modifiedMessage == "There is a winner" or modifiedMessage == "winner":
+    if  modifiedMessage == "There is a winner" or modifiedMessage == "Correct":
           break
     time.sleep(10.0) 
 

@@ -44,7 +44,7 @@ def guess_random_number(modifiedMessage,client_address):
 def program (connectionSocket, address):
 	
 	global winner, winner_name,number_of_player,counter
-	number_of_player +=1
+	
 
 	print(f"Connection from: {address}")
 
@@ -66,6 +66,11 @@ def program (connectionSocket, address):
 
 	
 	
+	message, clientAddress = server_socket1.recvfrom(1024)
+	if clientAddress[1] not in player_udp_addresses:
+			player_udp_addresses[clientAddress[1]] = message.decode()
+
+	number_of_player +=1
 	while number_of_player < 2:
 		time.sleep(0.2)
 
@@ -75,8 +80,8 @@ def program (connectionSocket, address):
 	
 	start_time=time.time() 
 
-	string_number_of_players=str(number_of_player)
-
+	
+	print (player_udp_addresses)
 	while True:
 		#to check if client still connected 
 		client_name = connectionSocket.recv(1024).decode()
@@ -86,13 +91,8 @@ def program (connectionSocket, address):
 			
 		# client guess
 		message, clientAddress = server_socket1.recvfrom(1024)
-
-
-		if clientAddress[1] not in player_udp_addresses:
-			player_udp_addresses[clientAddress[1]] = client_name 
 		message=message.decode()
-		###############
-
+		
 		
 
 		#send the result to client 
@@ -111,7 +111,7 @@ def program (connectionSocket, address):
 		
 		########################
 
-	print("sssssss")
+	
 	
 	counter +=1
 	while counter < number_of_player :
@@ -144,7 +144,7 @@ server_socket.bind((host, tcp_port))  # bind host address and port together
 # configure how many client the server can listen simultaneously #2
 server_socket.listen(4)
 thread=[]
-for _ in range(4):
+for _ in range(2):
 	connectionSocket, address = server_socket.accept()  # accept new connectionSocketection
 	t = threading.Thread(target=program, args=(connectionSocket, address))
 	t.start()
