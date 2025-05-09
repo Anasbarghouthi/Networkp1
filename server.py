@@ -96,12 +96,12 @@ def program (connectionSocket, address):
 	temp=str(player_list)
 	data=f"Game stared with players: {temp} \n you have 60 seconds to guess the number (0-100)!"
 	connectionSocket.send(data.encode())
-	
-	
-	start_time=time.time() 
+
+	connectionSocket.send(str(x).encode())
 
 	
 	
+	start_time=time.time() 
 	while True:
 		#to check if client still connected 
 		

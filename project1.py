@@ -1,5 +1,7 @@
 from socket import *
 import time
+
+
 tcp_port = 6000  # socket server port number
 host = gethostname()  # as both code is running on same pc
 udp_port=6001
@@ -7,6 +9,7 @@ udp_port=6001
 
 client_socket = socket(AF_INET,SOCK_STREAM)  # instantiate
 client_socket.connect((host, tcp_port))  # connect to the server
+
 message = input(" Enter your name: ")  # take input
 data=" "
 while data.lower().strip() != 'Enter game':
@@ -20,8 +23,14 @@ client_name=message
 
 client_socket1 = socket(AF_INET, SOCK_DGRAM)
 client_socket1.connect((host, udp_port))
+print (f"connected as {client_name}")
 client_socket1.sendto(client_name.encode(),(host,udp_port))
+print ("UDP connection established ")
 
+
+
+
+#?print instruction of game...
 data = client_socket.recv(1024).decode()  # receive response
 print (data)
 
@@ -39,6 +48,7 @@ while modifiedMessage != "Correct":
     modifiedMessage=modifiedMessage.decode()
     print("Feedback", modifiedMessage)
 
+    x = client_socket.recv(1024).decode()  # receive response
     a = client_socket.recv(1024).decode()  # receive response 
     
 
@@ -57,10 +67,12 @@ while modifiedMessage != "Correct":
              client_socket.send(yes_or_no.encode())
              if yes_or_no =="no":
                 print("======= WINNER =======")
+                print (f"Target number was : {x}")
                 break
 
         else: 
             print("=== GAME RESULTS ===") 
+            print (f"Target number was : {x}")
             print("The winner is:", a)
             break
 
