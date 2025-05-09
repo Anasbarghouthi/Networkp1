@@ -23,12 +23,13 @@ client_socket1.connect((host, udp_port))
 client_socket1.sendto(client_name.encode(),(host,udp_port))
 
 data = client_socket.recv(1024).decode()  # receive response
+print (data)
 
 modifiedMessage = ""
 
 
 #UDP sending 
-while modifiedMessage != "Correct" and modifiedMessage != "There is a winner":
+while modifiedMessage != "Correct":
     check_massage=client_name
     client_socket.send(check_massage.encode())
 
@@ -36,24 +37,27 @@ while modifiedMessage != "Correct" and modifiedMessage != "There is a winner":
     client_socket1.sendto(message.encode(),(host,udp_port))
     modifiedMessage, _ = client_socket1.recvfrom(1024)
     modifiedMessage=modifiedMessage.decode()
+    print("Feedback", modifiedMessage)
 
-    print("Feedback", modifiedMessage) 
-   
-    if  modifiedMessage == "There is a winner" or modifiedMessage == "Correct":
-          break
+    a = client_socket.recv(1024).decode()  # receive response 
+    
+
+    if a != "none": 
+        print(a)
+        if a == "time out": 
+            print("Time out \n======= LOSER =======") 
+            break
+        elif a == "you are alone" or a == "You won": 
+            print("======= WINNER =======")
+            break
+        else: 
+            print("=== GAME RESULTS ===") 
+            print("The winner is:", a)
+            break
+
     time.sleep(10.0) 
 
 
-
-	
-
-
-
-
-
-print ("===GAME RESULTS===\n")
-data = client_socket.recv(1024).decode()  # receive response
-print (data)
 client_socket.close()  # close the connection
 client_socket1.close()
 
