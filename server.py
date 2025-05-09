@@ -117,7 +117,7 @@ def program (connectionSocket, address,max_player):
 			
 		escape=time.time()-start_time
 		try:
-			print(winner)
+			
 			if winner:
 				print(winner)
 				if player_udp_addresses[clientAddress[1]] == winner_name:

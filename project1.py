@@ -43,7 +43,6 @@ while modifiedMessage != "Correct":
     
 
     if a != "none": 
-        print(a)
         if a == "time out": 
             print("Time out \n======= LOSER =======") 
             break
