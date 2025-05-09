@@ -17,10 +17,12 @@ number_of_player=0
 counter=0
 lock=threading.Lock()
 max_player=2
+i=0
 
 
 
 def guess_random_number(modifiedMessage,client_address):
+	
 	
 	global winner, winner_name,x
 	if not modifiedMessage.isdigit(): 
@@ -36,7 +38,8 @@ def guess_random_number(modifiedMessage,client_address):
 	else :
 		if not winner:
 			winner=True
-			winner_name=player_udp_addresses[client_address]	
+			winner_name=player_udp_addresses[client_address]
+				
 		return "Correct"
 	
 	
@@ -45,7 +48,7 @@ def guess_random_number(modifiedMessage,client_address):
 	
 def program (connectionSocket, address):
 	
-	global winner, winner_name,number_of_player,counter,max_player
+	global winner, winner_name,number_of_player,counter,max_player,i
 	
 
 	
@@ -83,8 +86,8 @@ def program (connectionSocket, address):
 	
 	
 	message, clientAddress = server_socket1.recvfrom(1024)
-	if clientAddress[1] not in player_udp_addresses:
-			player_udp_addresses[clientAddress[1]] = message.decode()
+	if clientAddress not in player_udp_addresses:
+			player_udp_addresses[clientAddress] = message.decode()
 
 	print(f"New Connection from: {address} as {data}")
 	if number_of_player ==0:
@@ -109,20 +112,23 @@ def program (connectionSocket, address):
 		
 		try:
 			client_name = connectionSocket.recv(1024).decode()
-		except (timeout,ConnectionResetError , ConnectionAbortedError , OSError):
-			if  (clientAddress[1] in player_udp_addresses):
-				print (player_udp_addresses[clientAddress[1]] ," is disconnected ")
+		except timeout:
+			continue	
+		except (ConnectionResetError , ConnectionAbortedError , OSError):
+			if  (clientAddress in player_udp_addresses):
+				print (player_udp_addresses[clientAddress] ," is disconnected ")
 				number_of_player -=1
 				break
 
 		############
+		
 			
 		# client guess
 		try:
 			message, clientAddress = server_socket1.recvfrom(1024)
 			message=message.decode()
 		#send the result to client 
-			message=guess_random_number(message,clientAddress[1])
+			message=guess_random_number(message,clientAddress)
 			server_socket1.sendto(message.encode(),clientAddress)
 		except (ConnectionResetError , ConnectionAbortedError , OSError):
 			continue	
@@ -135,10 +141,7 @@ def program (connectionSocket, address):
 		try:
 			
 			if winner:
-				if player_udp_addresses[clientAddress[1]] == winner_name:
-					a="You won"
-				else:
-					a=winner_name	
+				a=winner_name	
 				connectionSocket.send(a.encode())
 			elif escape >=60:
 				a="time out"
@@ -163,8 +166,10 @@ def program (connectionSocket, address):
 		
 		
 		########################
-
-
+	with lock:
+		if winner and i==0:
+			print (f"Game complete the winner is ===<{winner_name}>===")
+			i+=1
 	connectionSocket.close()  # close the connectionSocketection	
 
 	

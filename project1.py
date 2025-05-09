@@ -62,12 +62,6 @@ while modifiedMessage != "Correct":
         if a == "time out": 
             print("Time out \n======= LOSER =======") 
             break
-        elif a !="You won" and modifiedMessage == "Correct":
-             print (f"yes your guess is right but you too late {a} won ")
-             break
-        elif  a == "You won": 
-            print("======= WINNER =======")
-            break
         elif a == "you are alone":
              yes_or_no=input("you are alone do you want to continue / ( yes , no ) ")
              client_socket.send(yes_or_no.encode())
@@ -77,12 +71,12 @@ while modifiedMessage != "Correct":
                 break
 
         else: 
-            print("=== GAME RESULTS ===") 
+            print("=== GAME RESULTS ===")
+            print (f"the winner is {a}")
             print (f"Target number was : {x}")
-            print("The winner is:", a)
             break
 
-    time.sleep(5.0) 
+    time.sleep(10.0) 
 
 
 client_socket.close()  # close the connection
