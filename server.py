@@ -106,9 +106,7 @@ def program (connectionSocket, address):
 		
 		try:
 			client_name = connectionSocket.recv(1024).decode()
-		except timeout :
-			pass
-		except (ConnectionResetError , ConnectionAbortedError , OSError):
+		except (timeout,ConnectionResetError , ConnectionAbortedError , OSError):
 			if  (clientAddress[1] in player_udp_addresses):
 				print (player_udp_addresses[clientAddress[1]] ," is disconnected ")
 				number_of_player -=1
@@ -136,7 +134,7 @@ def program (connectionSocket, address):
 			if winner:
 				print(winner)
 				if player_udp_addresses[clientAddress[1]] == winner_name:
-					a="You win "
+					a="You won"
 				else:
 					a=winner_name	
 				connectionSocket.send(a.encode())
@@ -146,13 +144,18 @@ def program (connectionSocket, address):
 			elif number_of_player <=1 :
 				a="you are alone"
 				connectionSocket.send(a.encode())
+				yes_or_no=connectionSocket.recv(1024).decode()
+				if yes_or_no=="no":
+					break
+				else:
+					number_of_player +=1
 			else:
 				a="none"
 				connectionSocket.send(a.encode())
 		except	(ConnectionResetError , ConnectionAbortedError , OSError):
 			continue	
 					
-			
+		print (number_of_player)	
 		if escape >= 60 or winner  or number_of_player <=1 :
 			break
 		
@@ -188,15 +191,7 @@ for th in thread:
 	th.join()
 	 
 
-
-# while True:
-# 	if number_of_player <= 4:
-# 		connectionSocket, address = server_socket.accept()  # accept new connectionSocketection
-# 		t = threading.Thread(target=program, args=(connectionSocket, address))
-# 		t.start()
-# 	else:
-# 		print ("Maximum number of players reached. No more connections accepted.")
-# 		break	
+	
 
 
 

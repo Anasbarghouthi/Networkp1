@@ -46,9 +46,16 @@ while modifiedMessage != "Correct":
         if a == "time out": 
             print("Time out \n======= LOSER =======") 
             break
-        elif a == "you are alone" or a == "You won": 
+        elif  a == "You won": 
             print("======= WINNER =======")
             break
+        elif a == "you are alone":
+             yes_or_no=input("you are alone do you want to continue / ( yes , no ) ")
+             client_socket.send(yes_or_no.encode())
+             if yes_or_no =="no":
+                print("======= WINNER =======")
+                break
+
         else: 
             print("=== GAME RESULTS ===") 
             print("The winner is:", a)
