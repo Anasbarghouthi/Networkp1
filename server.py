@@ -16,6 +16,7 @@ udp_port = 6001
 number_of_player=0
 counter=0
 lock=threading.Lock()
+max_player=2
 
 
 
@@ -39,28 +40,42 @@ def guess_random_number(modifiedMessage,client_address):
 
 
 	
-def program (connectionSocket, address,max_player):
+def program (connectionSocket, address):
 	
-	global winner, winner_name,number_of_player,counter
-	
-
+	global winner, winner_name,number_of_player,counter,max_player
 	
 
-	data = connectionSocket.recv(1024).decode()
+	
+	try:
+		data = connectionSocket.recv(1024).decode()
+	except	(ConnectionResetError , ConnectionAbortedError , OSError):
+		max_player -=1
+		return	
+
 	while True :
-			t=True 
-			for i in player_list:
-				if data == i:
-					data = " Enter another name that name was used "
-					connectionSocket.send(data.encode())  # send data to the client
-					data = connectionSocket.recv(1024).decode()
-					t=False
-					break
-			if t:
-				player_list.append(data)
-				data = "Enter game"
-				connectionSocket.send(data.encode())  # send data to the client
-				break	
+			
+				t=True 
+				for i in player_list:
+					if data == i:
+						data = " Enter another name that name was used "
+						try:
+							connectionSocket.send(data.encode())  # send data to the client
+							data = connectionSocket.recv(1024).decode()
+						except	(ConnectionResetError , ConnectionAbortedError , OSError):
+							max_player -=1
+							return	
+						t=False
+						break
+				if t:
+					player_list.append(data)
+					data = "Enter game"
+					try:
+						connectionSocket.send(data.encode())  # send data to the client
+					except	(ConnectionResetError , ConnectionAbortedError , OSError):
+						max_player -=1
+						return	
+					break	
+			
 
 	
 	
@@ -144,24 +159,6 @@ def program (connectionSocket, address,max_player):
 		
 		########################
 
-	
-	
-	# counter +=1
-	# while counter < number_of_player :
-	# 	time.sleep(0.2)
-		
-	
-	# if winner:
-	# 	connectionSocket.send(winner_name.encode())  # send data to the client
-	# elif number_of_player <= 1 :
-	# 	try:
-	# 		data = "the another player disconnect  \n  you are the winner "
-	# 		connectionSocket.send(data.encode())  # send data to the client
-	# 	except (ConnectionResetError , ConnectionAbortedError , OSError):
-	# 		return
-	# else:
-	# 	data = "time out \n === Everyone lost =="
-	# 	connectionSocket.send(data.encode())  # send data to the client
 
 	connectionSocket.close()  # close the connectionSocketection	
 
@@ -183,7 +180,7 @@ server_socket.listen(4)
 thread=[]
 for _ in range(max_player):
 	connectionSocket, address = server_socket.accept()  # accept new connectionSocketection
-	t = threading.Thread(target=program, args=(connectionSocket, address,max_player))
+	t = threading.Thread(target=program, args=(connectionSocket, address))
 	t.start()
 	thread.append(t)
 
