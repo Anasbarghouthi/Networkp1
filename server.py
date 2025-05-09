@@ -27,6 +27,8 @@ def guess_random_number(modifiedMessage,client_address):
 		return "Please send a valid number."
 	
 	modifiedMessage=int(modifiedMessage)
+	if modifiedMessage > 100 :
+		return "Warning: out of the range , miss your chance "
 	if (x > modifiedMessage):
 		return "Higher"
 	elif (x < modifiedMessage):

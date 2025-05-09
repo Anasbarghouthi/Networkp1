@@ -44,9 +44,13 @@ while modifiedMessage != "Correct":
 
     message = input("Enter your guess: ")  
     client_socket1.sendto(message.encode(),(host,udp_port))
-    modifiedMessage, _ = client_socket1.recvfrom(1024)
+    modifiedMessage, _ = client_socket1.recvfrom(4096)
     modifiedMessage=modifiedMessage.decode()
-    print("Feedback", modifiedMessage)
+    if len(modifiedMessage) > 10 :
+         print (modifiedMessage)
+    else:      
+         print("Feedback", modifiedMessage)
+         
 
     x = client_socket.recv(1024).decode()  # receive response
     a = client_socket.recv(1024).decode()  # receive response 
