@@ -30,9 +30,11 @@ print ("UDP connection established ")
 
 
 
+
 #?print instruction of game...
 data = client_socket.recv(1024).decode()  # receive response
 print (data)
+x = client_socket.recv(1024).decode()  # receive response
 
 modifiedMessage = ""
 
@@ -52,7 +54,7 @@ while modifiedMessage != "Correct":
          print("Feedback", modifiedMessage)
          
 
-    x = client_socket.recv(1024).decode()  # receive response
+    
     a = client_socket.recv(1024).decode()  # receive response 
     
 
@@ -80,7 +82,7 @@ while modifiedMessage != "Correct":
             print("The winner is:", a)
             break
 
-    time.sleep(10.0) 
+    time.sleep(5.0) 
 
 
 client_socket.close()  # close the connection

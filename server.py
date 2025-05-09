@@ -154,6 +154,7 @@ def program (connectionSocket, address):
 			else:
 				a="none"
 				connectionSocket.send(a.encode())
+				
 		except	(ConnectionResetError , ConnectionAbortedError , OSError):
 			continue	
 						
