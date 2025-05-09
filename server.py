@@ -32,8 +32,9 @@ def guess_random_number(modifiedMessage,client_address):
 	elif (x < modifiedMessage):
 		return "Lower"
 	else :
-		winner=True
-		winner_name=player_udp_addresses[client_address]
+		if not winner:
+			winner=True
+			winner_name=player_udp_addresses[client_address]	
 		return "Correct"
 	
 	
@@ -132,7 +133,6 @@ def program (connectionSocket, address):
 		try:
 			
 			if winner:
-				print(winner)
 				if player_udp_addresses[clientAddress[1]] == winner_name:
 					a="You won"
 				else:
@@ -154,8 +154,7 @@ def program (connectionSocket, address):
 				connectionSocket.send(a.encode())
 		except	(ConnectionResetError , ConnectionAbortedError , OSError):
 			continue	
-					
-		print (number_of_player)	
+						
 		if escape >= 60 or winner  or number_of_player <=1 :
 			break
 		

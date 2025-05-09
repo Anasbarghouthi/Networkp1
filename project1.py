@@ -46,6 +46,9 @@ while modifiedMessage != "Correct":
         if a == "time out": 
             print("Time out \n======= LOSER =======") 
             break
+        elif a !="You won" and modifiedMessage == "Correct":
+             print (f"yes your guess is right but you too late {a} won ")
+             break
         elif  a == "You won": 
             print("======= WINNER =======")
             break
