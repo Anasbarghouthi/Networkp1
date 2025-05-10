@@ -177,6 +177,8 @@ def program (connectionSocket, address):
 
 x=random.randint(0,100)
 max_player=input("Enter the max number of player ")
+while not max_player.isdigit():
+	max_player=input("pleas enter a number : ")
 max_player=int(max_player)
 print ("the number is = ",x)
 server_socket1 = socket(AF_INET,SOCK_DGRAM)  # get instance
